@@ -46,20 +46,20 @@ var automm = automm || {};
                 // Make sure the note element is set up properly
                 note = $(note);
                 // mousedown event binding
-                note.mousedown(function () {
+                note.bind('vmousedown', function () {
                     // For Keeping track
                     lastClicked = note;
                     isClicking = true;
                     that.events.onNote.fire(note);
                 });
                 // mousup event binding
-                note.mouseup(function () {
+                note.bind('vmouseup', function () {
                     isClicking = false;
                     that.events.afterNote.fire(note);
                     lastClicked = {};
                 });
                 // mouse hover event binding
-                note.mouseover(function () {
+                note.bind('vmouseover', function () {
                     if (isClicking) {
                         that.events.afterNote.fire(lastClicked);
                         that.events.onNote.fire(note);
