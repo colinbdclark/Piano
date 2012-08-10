@@ -34,9 +34,11 @@ Octave  2: 36 - 47
 octave  3: 48 - 59
 Octave  4: 60 - 71 <--- This is the fourth octave on the piano
 
-A4 | Notes Per Octave | Octave Number  |  Frequency
-   |                  |                |
-69 |        12        |     4          |      440
+(Reference Note)
+
+A4 | Notes Per Octave | Octave Number  |  Frequency  |   Step in scale of Baseline
+   |                  |                |             |
+69 |        12        |     4          |      440    |              10
 
 Algorithm for Equal Tempered Tuning:
 
