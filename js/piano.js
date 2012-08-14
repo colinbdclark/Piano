@@ -132,13 +132,16 @@ var automm = automm || {};
             svg.attr("style", "height: 100%;");
             svg.attr("viewBox", that.model.viewbox.dim);
             svg.attr("role", "application");
+            svg.attr("focusable", true);
+            svg.attr("tabindex", "0");
+            svg.attr("aria-labelledby", "ariaTitle");
             
+
             that.noteGroup = svg.append("g");
             that.noteGroup.attr("transform", "translate(" + that.model.padding / 2 + "," + that.model.padding / 2 + ")");
             that.noteGroup.attr("role", "controlgroup");
             that.noteGroup.attr("id", "noteGroup");
             that.noteGroup.attr("focusable", true);
-
             // Draw the keys
             that.render();
         };
