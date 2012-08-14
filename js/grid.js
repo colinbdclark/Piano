@@ -81,6 +81,7 @@ var automm = automm || {};
             r.attr("id", id);
             r.attr("class", "note");
             r.attr("data-role", "button");
+            r.attr("aria-labelledby", "aria" + id);
             r.attr("noteType", noteType.fill);
         };
 
