@@ -104,10 +104,12 @@ var automm = automm || {};
             var instrumentType = that.container.children().eq(0),
                 // Create an array fille dwith objects stating note numbers and names of all rendered notes
                 noteArray = $(automm.fetchNotes(that.container, that.model.renderedNotes));
+            
             // Make the container tabbable
-            instrumentType.fluid("tabbable");
+            fluid.tabbable(instrumentType);
+            
             // Make the elements inside selectable
-            instrumentType.fluid("selectable", {
+            var selectables = fluid.selectable(instrumentType, {
                 // the default orientation is vertical, so we need to specify that this is horizontal.
                 // this affects what arrow keys will move selection
                 direction: fluid.a11y.orientation.HORIZONTAL,
@@ -115,12 +117,17 @@ var automm = automm || {};
                 autoSelectFirstItem: false,
 
                 onSelect: function (note) {
-                    note.focus();
+                    // TODO: Highlight the key in some way.
+                },
+                onUnselect: function (note) {
+                    // TODO: Unhighlight the key
                 }
             });
+            
             // Set the handler to be used when notes are activated
-            instrumentType.fluid("activatable", function (evt) {
-                that.onActivation(evt.target);
+            fluid.activatable(instrumentType, function (evt) {
+                var selected = selectables.selectedElement();
+                that.onActivation(selected);
             });
         };
 
