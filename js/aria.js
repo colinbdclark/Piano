@@ -122,8 +122,12 @@ var automm = automm || {};
                 // Create an array fille dwith objects stating note numbers and names of all rendered notes
                 noteArray = $(automm.fetchNotes(that.container, that.model.renderedNotes));
             
-            // Make the container tabbable
+            // Give the whole widget a role of application.
+            that.container.attr("role", "application");
+            
+            // Make instrument's container tabbable and labelled.
             fluid.tabbable(instrumentType);
+            instrumentType.attr("aria-labelledby", "ariaTitle");
             
             // Make the elements inside selectable
             var selectables = fluid.selectable(instrumentType, {
@@ -134,6 +138,7 @@ var automm = automm || {};
                 autoSelectFirstItem: false,
 
                 onSelect: function (note) {
+                    instrumentType.attr("aria-activedescendant", note.id);
                     // TODO: Highlight the key in some way.
                 },
                 onUnselect: function (note) {
