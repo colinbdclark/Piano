@@ -11,7 +11,7 @@ licenses are at the root of the Piano directory.
 
 */
 
-/*global jQuery, fluid*/
+/*global jQuery, fluid, document*/
 
 var automm = automm || {};
 
@@ -58,9 +58,10 @@ var automm = automm || {};
         };
 
         that.setTitle = function () {
-            var ariaContainer = that.container.find("#aria");
+            var ariaContainer = that.container.find("#aria"),
+                instrumentType = that.container.children()[0];
             // Append a div that will be used to title the aria application
-            ariaContainer.append("<div id='ariaTitle'>The Automagic Music Maker</div>");
+            ariaContainer.append("<div id='ariaTitle'>AutoMM " + that.container[0].id + " type: " + instrumentType.id + "</div>");
         };
 
         that.render = function () {
@@ -99,6 +100,22 @@ var automm = automm || {};
             }
         };
 
+        that.escaped = function () {
+            fluid.each(that.model.playingNotes, function (note) {
+                note = that.container.find("#" + note);
+                that.events.afterNote.fire(note);
+            });
+            that.model.playingNotes = [];
+        };
+
+        that.bindEscape = function () {
+            $(document).keydown(function (event) {
+                if (event.keyCode === 27) {
+                    that.escaped();
+                }
+            });
+        };
+
         that.fluidInit = function () {
             // Find type of instrument that has been rendered
             var instrumentType = that.container.children().eq(0),
@@ -135,6 +152,7 @@ var automm = automm || {};
             that.getNotes();
             that.render();
             that.fluidInit();
+            that.bindEscape();
         };
     };
 
