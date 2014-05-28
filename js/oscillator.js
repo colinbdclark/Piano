@@ -19,12 +19,23 @@ var automm = automm || {};
 
 (function ($) {
     "use strict";
+
+    fluid.defaults("automm.replaceablePolySynth", {
+        gradeNames: ["flock.synth.polyphonic", "autoInit"],
+        synthDef: {
+
+        },
+        mergePolicy: {
+            synthDef: "replace"
+        }
+    });
+
     fluid.defaults("automm.oscillator", {
         gradeNames: ["fluid.modelComponent", "fluid.eventedComponent", "autoInit"],
 
         components: {
             polysynth: {
-                type: "flock.synth.polyphonic",
+                type: "automm.replaceablePolySynth",
                 options: {
                     // TODO: Generate this synthDef using model transformation.
                     synthDef: {

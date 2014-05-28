@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Using Custom Flocking Synths with the AMM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="css/custom.css" rel="stylesheet">
+    <link href="css/third_party/normalize.css" rel="stylesheet">
+
+    <script src="bower_components/flocking/dist/flocking-all.js"></script>
+    <script src="js/third_party/jquery.ui.core.js"></script>
+    <script src="js/third_party/jquery.keyboard-a11y.js"></script>
+    <script src="bower_components/d3/d3.js"></script>
+    <script src="dist/automm.js"></script>
+</head>
+
+<body>
+    <div id="instrument">
+        <div id="piano"></div>
+    </div>
+
+    <script type="text/javascript">
+        var piano = automm.instrument("#instrument", {
+            model: {
+                octaves: 2,
+                padding: 10,
+                keys: {
+                    white: {
+                        fill: "LightSkyBlue",
+                        highlight: "silver"
+                    },
+                    black: {
+                        fill: "hotpink",
+                        highlight: "crimson"
+                    }
+                }
+            },
+
+            distributeOptions: {
+                source: "{that}.options.synthDef",
+                removeSource: true,
+                target: "{that flock.synth.polyphonic}.options.synthDef"
+            },
+
+            synthDef: {
+                id: "filter",
+                ugen: "flock.ugen.filter.moog",
+                cutoff: 20000,
+                resonance: {
+                    ugen: "flock.ugen.sin",
+                    freq: 2,
+                    mul: 1.5,
+                    add: 1.5
+                },
+                source: {
+                    id: "carrier",
+                    ugen: "flock.ugen.lfSaw",
+                    freq: "{oscillator}.model.freq",
+                    mul: {
+                        id: "env",
+                        ugen: "flock.ugen.env.simpleASR",
+                        attack: "{oscillator}.model.attack",
+                        sustain: "{oscillator}.model.sustain",
+                        release: 1
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
