@@ -5,9 +5,9 @@ Primarily written by Myles Borins
 Strongly influenced by GSOC Mentor Colin Clark
 Using the Infusion framework and Flocking Library
 
-The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses. 
-Choose the license that best suits your project. The text of the MIT and GPL 
-licenses are at the root of the Piano directory. 
+The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses.
+Choose the license that best suits your project. The text of the MIT and GPL
+licenses are at the root of the Piano directory.
 
 */
 
@@ -20,8 +20,6 @@ var automm = automm || {};
 
     fluid.defaults("automm.highlighter", {
         gradeNames: ["fluid.viewComponent", "autoInit"],
-        preInitFunction: "automm.highlighter.preInitFunction",
-        postInitFunction: "automm.highlighter.postInitFunction",
 
         model: {
             keys: {
@@ -40,7 +38,7 @@ var automm = automm || {};
         }
     });
 
-    automm.highlighter.preInitFunction = function (that) {
+    automm.highlighter.preInit = function (that) {
         that.currentlySelected = null;
         that.currentlyPlaying = [];
 
@@ -94,7 +92,7 @@ var automm = automm || {};
         };
     };
 
-    automm.highlighter.postInitFunction = function (that) {
+    automm.highlighter.finalInit = function (that) {
         that.events.onNote.addListener(that.onNote);
         that.events.afterNote.addListener(that.afterNote);
         that.events.afterNoteCalc.addListener(that.afterNoteCalc);
@@ -124,5 +122,5 @@ var automm = automm || {};
         var isPlaying = $.inArray(note, currentlyPlaying);
         return isPlaying;
     };
-    
+
 }(jQuery));

@@ -5,8 +5,8 @@ Primarily written by Myles Borins
 Strongly influenced by GSOC Mentor Colin Clark
 Using the Infusion framework and Flocking Library
 
-The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses. 
-Choose the license that best suits your project. The text of the MIT and GPL 
+The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses.
+Choose the license that best suits your project. The text of the MIT and GPL
 licenses are at the root of the Piano directory. -->
 <html lang="en">
   <head>
@@ -19,25 +19,22 @@ licenses are at the root of the Piano directory. -->
 
     <!-- Le styles -->
     <link href="css/third_party/normalize.css" rel="stylesheet">
+
+    <script src="bower_components/flocking/dist/flocking-all.js"></script>
+    <script src="js/third_party/jquery.ui.core.js"></script>
+    <script src="js/third_party/jquery.keyboard-a11y.js"></script>
+    <script src="bower_components/d3/d3.js"></script>
+    <script src="bower_components/dat-gui/build/dat.gui.js"></script>
+    <script src="dist/automm.js"></script>
 </head>
 
 <body>
     <div id="instrument">
         <div id="piano"></div>
     </div>
-    <script src="js/third_party/jquery-1.7.2.min.js"></script>
-    <script src="js/third_party/jquery.ui.core.js"></script>
-    <script src="js/third_party/infusion-framework.min.js"></script>
-    <script src="js/third_party/flocking.min.js"></script>
-    <script src="js/third_party/d3/d3.v2.js"></script>
-    <script src="js/third_party/dat.gui.js"></script>
-    <script src="js/automm.min.js"></script>
+
     <script type="text/javascript">
-    /*global jQuery, fluid*/
-    var automm = automm || {};
-    var instrument = instrument || {};
-    (function(){
-        "use strict";
+        /*global jQuery, fluid, automm*/
 
         // Draw a piano based on the below model (Subject to change)
         // model: {
@@ -66,11 +63,7 @@ licenses are at the root of the Piano directory. -->
         //         }
         //     }
         // }
-
-
-        instrument = automm.instrument("#instrument");
-    }());
-
+        var instrument = automm.instrument("#instrument");
     </script>
 </body>
 </html>

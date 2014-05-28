@@ -5,9 +5,9 @@ Primarily written by Myles Borins
 Strongly influenced by GSOC Mentor Colin Clark
 Using the Infusion framework and Flocking Library
 
-The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses. 
-Choose the license that best suits your project. The text of the MIT and GPL 
-licenses are at the root of the Piano directory. 
+The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses.
+Choose the license that best suits your project. The text of the MIT and GPL
+licenses are at the root of the Piano directory.
 
 */
 /*global jQuery, fluid, dat */
@@ -44,13 +44,10 @@ var automm = automm || {};
 
         events: {
             afterGuiUpdate: null
-        },
-
-        preInitFunction: "automm.gui.preInitFunction",
-        postInitFunction: "automm.gui.postInitFunction"
+        }
     });
 
-    automm.gui.preInitFunction = function (that) {
+    automm.gui.preInit = function (that) {
         that.init = function () {
             that.datgui = new dat.GUI({ autoPlace: false });
             that.customContainer = that.container.children('#gui');
@@ -113,10 +110,10 @@ var automm = automm || {};
         //     that.datgui[param] = that.datgui[param] || that.datgui.add(that.model, param, 1, 5);
         // };
         // that.addFolder = function (name) {
-        //     
+        //
         // };
         // that.appendFolder = function (name) {
-        //     
+        //
         // }
         that.update = function (param, value) {
             that.applier.requestChange(param, value);
@@ -125,7 +122,7 @@ var automm = automm || {};
         };
     };
 
-    automm.gui.postInitFunction = function (that) {
+    automm.gui.finalInit = function (that) {
         if (that.model.drawGui) {
             if (that.container.find("gui").length < 1) {
                 that.container.append("<div id='gui' aria-hidden='true'></div>");

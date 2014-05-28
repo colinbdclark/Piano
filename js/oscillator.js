@@ -5,9 +5,9 @@ Primarily written by Myles Borins
 Strongly influenced by GSOC Mentor Colin Clark
 Using the Infusion framework and Flocking Library
 
-The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses. 
-Choose the license that best suits your project. The text of the MIT and GPL 
-licenses are at the root of the Piano directory. 
+The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses.
+Choose the license that best suits your project. The text of the MIT and GPL
+licenses are at the root of the Piano directory.
 
 */
 
@@ -21,8 +21,6 @@ var automm = automm || {};
     "use strict";
     fluid.defaults("automm.oscillator", {
         gradeNames: ["fluid.modelComponent", "fluid.eventedComponent", "autoInit"],
-        preInitFunction: "automm.oscillator.preInitFunction",
-        postInitFunction: "automm.oscillator.postInitFunction",
 
         components: {
             polysynth: {
@@ -44,7 +42,7 @@ var automm = automm || {};
                 }
             }
         },
-        
+
         model: {
             arpActive: false,
             freq: 440,
@@ -66,7 +64,7 @@ var automm = automm || {};
             afterClick: null,
             afterInstrumentUpdate: null
         },
-        
+
         // Maps parameter between this model and the model of flocking
         paramMap: {
             "freq": "carrier.freq",
@@ -77,11 +75,11 @@ var automm = automm || {};
         }
     });
 
-    automm.oscillator.preInitFunction = function (that) {
+    automm.oscillator.preInit = function (that) {
         if (!flock.enviro.shared) {
             flock.init();
         }
-        
+
         that.update = function (param, value) {
             if (that.model.hasOwnProperty(param)) {
                 that.applier.requestChange(param, value);
@@ -119,7 +117,7 @@ var automm = automm || {};
         };
     };
 
-    automm.oscillator.postInitFunction = function (that) {
+    automm.oscillator.finalInit = function (that) {
         // That.update creates a function that takes a parameter from the model
         // and updates it's value
         //  the applier directly below adds a listener to all instances of the model chaning

@@ -5,9 +5,9 @@ Primarily written by Myles Borins
 Strongly influenced by GSOC Mentor Colin Clark
 Using the Infusion framework and Flocking Library
 
-The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses. 
-Choose the license that best suits your project. The text of the MIT and GPL 
-licenses are at the root of the Piano directory. 
+The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses.
+Choose the license that best suits your project. The text of the MIT and GPL
+licenses are at the root of the Piano directory.
 
 */
 /*global jQuery, fluid */
@@ -18,7 +18,6 @@ var automm = automm || {};
     "use strict";
     fluid.defaults("automm.instrument", {
         gradeNames: ["fluid.viewComponent", "autoInit"],
-        postInitFunction: "automm.instrument.postInitFunction",
 
         model: {
             autoPiano: false,
@@ -58,7 +57,7 @@ var automm = automm || {};
             // This pattern is in Note Degrees starting from 0 ({"I"": 0, "II":1, "III":etcetcetc})
             arpPattern: [0, 2, 4],
 
-            // This is a connanon which is used to collect modes / scales / etc.... 
+            // This is a connanon which is used to collect modes / scales / etc....
             // probably shouldn't live here
             canon: {
                 modes: {
@@ -239,7 +238,7 @@ var automm = automm || {};
                         firstNote: "{instrument}.model.firstNote",
                         octaves: "{instrument}.model.octaves",
                         octaveNotes: "{instrument}.model.octaveNotes",
-                        
+
                         canon: "{instrument}.model.canon"
                     },
 
@@ -255,7 +254,7 @@ var automm = automm || {};
         }
     });
 
-    automm.instrument.postInitFunction = function (that) {
+    automm.instrument.finalInit = function (that) {
         that.update = function (param, value) {
             that.applier.requestChange(param, value);
             that.events.afterInstrumentUpdate.fire(param, value);

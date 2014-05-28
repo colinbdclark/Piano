@@ -1,0 +1,17 @@
+{
+    "name": "automagic-music-maker",
+    "main": "dist/automm.min.js",
+    "version": "0.2.0",
+    "ignore": [
+        "js",
+        "node_modules",
+        "*.html",
+        "TODO",
+        "package.json"
+    ],
+    "dependencies": {
+        "d3": ">=3.4.8",
+        "flocking": "git://github.com/colinbdclark/Flocking.git",
+        "dat-gui": ">=0.5.0"
+    }
+}

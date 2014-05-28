@@ -5,9 +5,9 @@ Primarily written by Myles Borins
 Strongly influenced by GSOC Mentor Colin Clark
 Using the Infusion framework and Flocking Library
 
-The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses. 
-Choose the license that best suits your project. The text of the MIT and GPL 
-licenses are at the root of the grid directory. 
+The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses.
+Choose the license that best suits your project. The text of the MIT and GPL
+licenses are at the root of the grid directory.
 
 */
 
@@ -20,8 +20,6 @@ var automm = automm || {};
 
     fluid.defaults("automm.grid", {
         gradeNames: ["fluid.viewComponent", "autoInit"],
-        preInitFunction: "automm.grid.preInitFunction",
-        postInitFunction: "automm.grid.postInitFunction",
 
         model: {
             auto: false,
@@ -68,7 +66,7 @@ var automm = automm || {};
         }
     });
 
-    automm.grid.preInitFunction = function (that) {
+    automm.grid.preInit = function (that) {
         that.setup = function () {
             var noteNum = that.model.firstNote,
                 i;
@@ -175,7 +173,7 @@ var automm = automm || {};
         };
     };
 
-    automm.grid.postInitFunction = function (that) {
+    automm.grid.finalInit = function (that) {
         var gridElements = that.container.find("#grid").length;
         if (that.model.auto && gridElements < 1) {
             that.container.append("<div id='grid'></div>");
