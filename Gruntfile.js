@@ -34,6 +34,14 @@ module.exports = function(grunt) {
             dist: {
                 files: [
                     {
+                        "dist/automm-all.min.js": [
+                            "js/third_party/jquery.ui.core.js",
+                            "js/third_party/jquery.keyboard-a11y.js",
+                            "bower_components/d3/d3.js",
+                            "dist/automm.js"
+                        ]
+                    },
+                    {
                         expand: true,
                         cwd: 'dist/',
                         src: ['*.js'],

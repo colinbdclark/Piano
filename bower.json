@@ -1,6 +1,6 @@
 {
     "name": "automagic-music-maker",
-    "main": "dist/automm.min.js",
+    "main": "dist/automm-all.min.js",
     "version": "0.2.0",
     "ignore": [
         "js",
