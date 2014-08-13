@@ -58,21 +58,29 @@ var automm = automm || {};
             that.notes.each(function (i, note) {
                 // Make sure the note element is set up properly
                 note = $(note);
-                // mousedown event binding
-                note.mousedown(function () {
+                var mouseDownHandler = function () {
                     // For Keeping track
                     lastClicked = note;
                     isClicking = true;
                     that.onClick(note);
-                });
-                // mousup event binding
-                note.mouseup(function () {
+                };
+
+                // mousedown event binding
+                note.mousedown(mouseDownHandler);
+                note.on("touchstart", mouseDownHandler);
+
+                var mouseUpHandler = function () {
                     isClicking = false;
                     if (!that.model.isShift) {
                         that.events.afterClick.fire(note);
                     }
                     lastClicked = {};
-                });
+                };
+
+                // mousup event binding
+                note.mouseup(mouseUpHandler);
+                note.on("touchend", mouseUpHandler);
+
                 // mouse hover event binding
                 note.mouseover(function () {
                     if (isClicking) {
@@ -82,6 +90,12 @@ var automm = automm || {};
                         that.onClick(note);
                     }
                     lastClicked = note;
+                });
+                note.one("mousedown", function () {
+                    var enviro = flock.enviro.shared;
+                    if (enviro && !enviro.model.isPlaying) {
+                        flock.enviro.shared.play();
+                    }
                 });
             });
             /*jslint unparam: false*/

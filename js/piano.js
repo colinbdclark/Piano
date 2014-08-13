@@ -58,6 +58,13 @@ var automm = automm || {};
             afterInstrumentUpdate: null,
             afterNoteCalc: null,
             getNoteCalc: null
+        },
+
+        listeners: {
+            onCreate: {
+                funcName: "automm.piano.init",
+                args: "{that}"
+            }
         }
     });
 
@@ -177,7 +184,7 @@ var automm = automm || {};
         };
     };
 
-    automm.piano.finalInit = function (that) {
+    automm.piano.init = function (that) {
         var pianoElements = that.container.find("#piano").length;
         if (that.model.auto && pianoElements < 1) {
             that.container.append("<div id='piano'></div>");
@@ -191,6 +198,5 @@ var automm = automm || {};
             that.events.afterInstrumentUpdate.addListener(that.update);
             that.events.getNoteCalc.addListener(that.sendNoteCalc);
         }
-
     };
 }());

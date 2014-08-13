@@ -130,7 +130,6 @@ var automm = automm || {};
             that.polysynth.input(oscPath, newModel[path]);
         });
         /*jslint unparam: false*/
-        flock.enviro.shared.play();
         that.events.onNote.addListener(that.onNote);
         that.events.afterNote.addListener(that.afterNote);
         that.events.onClick.addListener(that.onClick);

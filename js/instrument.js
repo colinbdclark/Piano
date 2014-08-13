@@ -16,7 +16,8 @@ var automm = automm || {};
 
 (function () {
     "use strict";
-    fluid.defaults("automm.instrument", {
+
+    fluid.defaults("automm.controller", {
         gradeNames: ["fluid.viewComponent", "autoInit"],
 
         model: {
@@ -46,8 +47,102 @@ var automm = automm || {};
                     highlight: '#fff000', //  Yellow
                     selected: '#00F5FF'  // Turquoise
                 }
+            }
+        },
+
+        events: {
+            onNote: null,
+            afterNote: null,
+            afterInstrumentUpdate: null,
+            afterGuiUpdate: null,
+            afterNoteCalc: null,
+            afterUpdate: null,
+            getNoteCalc: null,
+            afterPoly: null,
+            onClick: null,
+            afterClick: null,
+            onSelect: null
+        },
+
+        listeners: {
+            afterGuiUpdate: {
+                func: "{that}.update"
+            }
+        },
+
+        invokers: {
+            update: {
+                funcName: "automm.controller.update",
+                args: [
+                    "{that}.applier", "{that}.events.afterInstrumentUpdate",
+                    "{arguments}.0", "{arguments}.1"
+                ]
+            }
+        },
+
+        components: {
+            eventBinder: {
+                type: "automm.eventBinder",
+                container: "{controller}.container",
+                options: {
+                    events: {
+                        afterUpdate: "{controller}.events.afterUpdate",
+                        onClick: "{controller}.events.onClick",
+                        afterClick: "{controller}.events.afterClick",
+                        onNote: "{controller}.events.onNote",
+                        afterNote: "{controller}.events.afterNote",
+                        afterPoly: "{controller}.events.afterPoly"
+                    }
+                }
             },
 
+            highlighter: {
+                type: "automm.highlighter",
+                container: "{controller}.container",
+                options: {
+                    model: {
+                        keys: "{controller}.model.keys"
+                    },
+                    events: {
+                        onClick: "{controller}.events.onClick",
+                        afterClick: "{controller}.events.afterClick",
+                        onNote: "{controller}.events.onNote",
+                        afterNote: "{controller}.events.afterNote",
+                        afterNoteCalc: "{controller}.events.afterNoteCalc",
+                        getNoteCalc: "{controller}.events.getNoteCalc",
+                        onSelect: "{controller}.events.onSelect"
+                    }
+                }
+            },
+
+            aria: {
+                type: "automm.aria",
+                container: "{controller}.container",
+                options: {
+                    model: {
+                        octaveNotes: "{controller}.model.octaveNotes"
+                    },
+                    events: {
+                        afterUpdate: "{controller}.events.afterGuiUpdate",
+                        onClick: "{controller}.events.onClick",
+                        afterClick: "{controller}.events.afterClick",
+                        onSelect: "{controller}.events.onSelect"
+                    }
+                }
+            }
+        }
+    });
+
+
+    automm.controller.update = function (applier, afterInstrumentUpdate, param, value) {
+        that.applier.requestChange(param, value);
+        that.events.afterInstrumentUpdate.fire(param, value);
+    };
+
+    fluid.defaults("automm.withArpeggiator", {
+        gradeNames: ["fluid.modelComponent", "autoInit"],
+
+        model: {
             arpActive: false,
             // Rate of the metronome... should be in bpm
             interval: 150,
@@ -74,22 +169,78 @@ var automm = automm || {};
                     minor: [2, 2, 1, 2, 2, 1, 2]
                 }
             }
-
         },
 
-        events: {
-            onNote: null,
-            afterNote: null,
-            afterInstrumentUpdate: null,
-            afterGuiUpdate: null,
-            afterNoteCalc: null,
-            afterUpdate: null,
-            getNoteCalc: null,
-            afterPoly: null,
-            onClick: null,
-            afterClick: null,
-            onSelect: null
-        },
+        components: {
+            arpeggiator: {
+                type: "automm.arpeggiator",
+                container: "{withArpeggiator}.container",
+                options: {
+                    model: "{withArpeggiator}.model",
+                    events: {
+                        onNote: "{withArpeggiator}.events.onNote",
+                        afterNote: "{withArpeggiator}.events.afterNote",
+                        onClick: "{withArpeggiator}.events.onClick",
+                        afterClick: "{withArpeggiator}.events.afterClick",
+                        afterInstrumentUpdate: "{withArpeggiator}.events.afterInstrumentUpdate"
+                    }
+                }
+            }
+        }
+    });
+
+    fluid.defaults("automm.keyboardController", {
+        gradeNames: ["automm.controller", "automm.withArpeggiator", "autoInit"],
+
+        components: {
+            piano: {
+                type: "automm.piano",
+                container: "{keyboardController}.container",
+                options: {
+                    model: "{keyboardController}.model",
+                    events: {
+                        afterInstrumentUpdate: "{keyboardController}.events.afterInstrumentUpdate",
+                        afterNoteCalc: "{keyboardController}.events.afterNoteCalc",
+                        afterUpdate: "{keyboardController}.events.afterUpdate",
+                        getNoteCalc: "{keyboardController}.events.getNoteCalc"
+                    }
+                }
+            }
+        }
+    });
+
+    fluid.defaults("automm.gridController", {
+        gradeNames: ["automm.controller", "automm.withArpeggiator", "autoInit"],
+
+        components: {
+            grid: {
+                type: "automm.grid",
+                container: "{gridController}.container",
+                options: {
+                    model: {
+                        auto: "{gridController}.model.autoGrid",
+                        columns: "{gridController}.model.columns",
+                        rows: "{gridController}.model.rows",
+                        firstNote: "{gridController}.model.firstNote", // Middle C
+                        octaveNotes: "{gridController}.model.octaveNotes",
+                        padding: "{gridController}.model.padding",
+                        pattern: "{gridController}.model.pattern",
+                        keys: "{gridController}.model.keys"
+                    },
+                    events: {
+                        afterInstrumentUpdate: "{gridController}.events.afterInstrumentUpdate",
+                        afterNoteCalc: "{gridController}.events.afterNoteCalc",
+                        afterUpdate: "{gridController}.events.afterUpdate",
+                        getNoteCalc: "{gridController}.events.getNoteCalc"
+                    }
+                }
+
+            }
+        }
+    });
+
+    fluid.defaults("automm.instrument", {
+        gradeNames: ["automm.controller", "automm.withArpeggiator", "autoInit"],
 
         components: {
             piano: {
@@ -113,6 +264,7 @@ var automm = automm || {};
                     }
                 }
             },
+
             grid: {
                 type: "automm.grid",
                 container: "{instrument}.container",
@@ -172,94 +324,8 @@ var automm = automm || {};
                         afterGuiUpdate: "{instrument}.events.afterGuiUpdate"
                     }
                 }
-            },
-
-            eventBinder: {
-                type: "automm.eventBinder",
-                container: "{instrument}.container",
-                options: {
-                    events: {
-                        afterUpdate: "{instrument}.events.afterUpdate",
-                        onClick: "{instrument}.events.onClick",
-                        afterClick: "{instrument}.events.afterClick",
-                        onNote: "{instrument}.events.onNote",
-                        afterNote: "{instrument}.events.afterNote",
-                        afterPoly: "{instrument}.events.afterPoly"
-                    }
-                }
-            },
-
-            highlighter: {
-                type: "automm.highlighter",
-                container: "{instrument}.container",
-                options: {
-                    model: {
-                        keys: "{instrument}.model.keys"
-                    },
-                    events: {
-                        onClick: "{instrument}.events.onClick",
-                        afterClick: "{instrument}.events.afterClick",
-                        onNote: "{instrument}.events.onNote",
-                        afterNote: "{instrument}.events.afterNote",
-                        afterNoteCalc: "{instrument}.events.afterNoteCalc",
-                        getNoteCalc: "{instrument}.events.getNoteCalc",
-                        onSelect: "{instrument}.events.onSelect"
-                    }
-                }
-            },
-
-            aria: {
-                type: "automm.aria",
-                container: "{instrument}.container",
-                options: {
-                    model: {
-                        octaveNotes: "{instrument}.model.octaveNotes"
-                    },
-                    events: {
-                        afterUpdate: "{instrument}.events.afterGuiUpdate",
-                        onClick: "{instrument}.events.onClick",
-                        afterClick: "{instrument}.events.afterClick",
-                        onSelect: "{instrument}.events.onSelect"
-                    }
-                }
-            },
-
-            arpeggiator: {
-                type: "automm.arpeggiator",
-                container: "{grid}.container",
-                options: {
-                    model: {
-                        arpActive: "{instrument}.model.arpActive",
-                        notificationShowing: "{instrument}.model.notificationShowing",
-                        interval: "{instrument}.model.interval",
-                        scale: "{instrument}.model.scale",
-                        mode: "{instrument}.model.mode",
-                        arpPattern: "{instrument}.model.arpPattern",
-                        firstNote: "{instrument}.model.firstNote",
-                        octaves: "{instrument}.model.octaves",
-                        octaveNotes: "{instrument}.model.octaveNotes",
-
-                        canon: "{instrument}.model.canon"
-                    },
-
-                    events: {
-                        onNote: "{instrument}.events.onNote",
-                        afterNote: "{instrument}.events.afterNote",
-                        onClick: "{instrument}.events.onClick",
-                        afterClick: "{instrument}.events.afterClick",
-                        afterInstrumentUpdate: "{instrument}.events.afterInstrumentUpdate"
-                    }
-                }
             }
         }
     });
 
-    automm.instrument.finalInit = function (that) {
-        that.update = function (param, value) {
-            that.applier.requestChange(param, value);
-            that.events.afterInstrumentUpdate.fire(param, value);
-            return that;
-        };
-        that.events.afterGuiUpdate.addListener(that.update);
-    };
 }());
