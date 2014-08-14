@@ -68,6 +68,14 @@ var automm = automm || {};
             afterInstrumentUpdate: null
         },
 
+        listeners: {
+            onNote: "{that}.onNote({arguments}.0)",
+            afterNote: "{that}.afterNote({arguments}.0)",
+            onClick: "{that}.onClick({arguments}.0)",
+            afterClick: "{that}.afterClick({arguments}.0)",
+            afterInstrumentUpdate: "{that}.update()"
+        },
+
         // Maps parameter between this model and the model of flocking
         paramMap: {
             "freq": "carrier.freq",
@@ -132,11 +140,6 @@ var automm = automm || {};
             that.polysynth.input(oscPath, newModel[path]);
         });
         /*jslint unparam: false*/
-        that.events.onNote.addListener(that.onNote);
-        that.events.afterNote.addListener(that.afterNote);
-        that.events.onClick.addListener(that.onClick);
-        that.events.afterClick.addListener(that.afterClick);
-        that.events.afterInstrumentUpdate.addListener(that.update);
     };
 
     automm.midiToFreq = function (noteNum, octaveNotes, afour, afourFreq) {
@@ -150,9 +153,9 @@ Primarily written by Myles Borins
 Strongly influenced by GSOC Mentor Colin Clark
 Using the Infusion framework and Flocking Library
 
-The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses. 
-Choose the license that best suits your project. The text of the MIT and GPL 
-licenses are at the root of the Piano directory. 
+The Automagic Music Maker is distributed under the terms the MIT or GPL2 Licenses.
+Choose the license that best suits your project. The text of the MIT and GPL
+licenses are at the root of the Piano directory.
 
 */
 
@@ -182,7 +185,7 @@ var automm = automm || {};
             octaves: 1,
             octaveNotes: 12,
 
-            // This is a connanon which is used to collect modes / scales / etc.... 
+            // This is a connanon which is used to collect modes / scales / etc....
             // probably shouldn't live here
             canon: {
                 modes: {
@@ -200,7 +203,7 @@ var automm = automm || {};
                 }
             }
         },
-        
+
         components: {
             metronome: {
                 type: "flock.scheduler.async",
@@ -219,6 +222,13 @@ var automm = automm || {};
             afterClick: null,
             onNote: null,
             afterNote: null,
+
+            // MIDI-compatible events.
+            // TODO: These should replace onNote/afterNote.
+            message: null,
+            noteOn: null,
+            noteOff: null,
+
             metronomeEvent: null,
             afterInstrumentUpdate: null,
             arpActive: null
@@ -296,7 +306,7 @@ var automm = automm || {};
         //  The below metronome are Web Workers running at a particular time interval
         //  They are by creating flock.
         // that.setMetronome = function (interval) {
-        //     
+        //
         // };
 
         that.startMetronome = function (interval) {
@@ -331,12 +341,26 @@ var automm = automm || {};
 
                     if (!firstTime) {
                         that.events.afterNote.fire(prevNote);
+                        that.events.noteOff.fire({
+                            type: "noteOff",
+                            chan: 1,
+                            note: prevNote,
+                            velocity: 0
+                        });
+
                         that.currentlyPlaying.splice(($.inArray(note, that.currentlyPlaying)), 1);
                     } else {
                         firstTime = false;
                     }
 
                     that.events.onNote.fire(note);
+                    that.events.noteOn.fire({
+                        type: "noteOn",
+                        chan: 1,
+                        note: note,
+                        velocity: 127
+                    });
+
                     that.currentlyPlaying.push(note);
 
                     if (count >= that.model.arpPattern.length - 1) {
@@ -363,6 +387,12 @@ var automm = automm || {};
 
             fluid.each(that.currentlyPlaying, function (note) {
                 that.events.afterNote.fire(note);
+                that.events.noteOff.fire({
+                    type: "noteOff",
+                    chan: 1,
+                    note: note,
+                    velocity: 0
+                });
             });
         };
 
@@ -427,7 +457,7 @@ var automm = automm || {};
     automm.offsetMod = function (i, range) {
         // i is any number
         // range is an object
-        // 
+        //
         // See if the number is below the range and needs to be modded down
         // range = {
         //     low: that.model.firstNote,
@@ -445,7 +475,8 @@ var automm = automm || {};
 
         return i;
     };
-}(jQuery));;/*
+}(jQuery));
+;/*
 Google Summer of Code 2012: Automagic Music Maker
 
 Primarily written by Myles Borins
@@ -1085,6 +1116,12 @@ var automm = automm || {};
         },
 
         events: {
+            // MIDI-compatible events.
+            // TODO: These should replace onNote/afterNote.
+            message: null,
+            noteOn: null,
+            noteOff: null,
+
             onNote: null,
             afterNote: null,
             afterInstrumentUpdate: null,
@@ -1115,6 +1152,19 @@ var automm = automm || {};
         },
 
         components: {
+            noteSource: {
+                type: "automm.noteSource",
+                options: {
+                    events: {
+                        onClick: "{controller}.events.onClick",
+                        afterClick: "{controller}.events.afterClick",
+                        message: "{controller}.events.message",
+                        noteOn: "{controller}.events.noteOn",
+                        noteOff: "{controller}.events.noteOff"
+                    }
+                }
+            },
+
             eventBinder: {
                 type: "automm.eventBinder",
                 container: "{controller}.container",
@@ -1147,26 +1197,47 @@ var automm = automm || {};
                         onSelect: "{controller}.events.onSelect"
                     }
                 }
-            },
-
-            aria: {
-                type: "automm.aria",
-                container: "{controller}.container",
-                options: {
-                    model: {
-                        octaveNotes: "{controller}.model.octaveNotes"
-                    },
-                    events: {
-                        afterUpdate: "{controller}.events.afterGuiUpdate",
-                        onClick: "{controller}.events.onClick",
-                        afterClick: "{controller}.events.afterClick",
-                        onSelect: "{controller}.events.onSelect"
-                    }
-                }
             }
         }
     });
 
+    fluid.defaults("automm.noteSource", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        events: {
+            onClick: null,
+            afterClick: null,
+
+            message: null,
+            noteOn: null,
+            noteOff: null
+        },
+
+        // TODO: Modelize these.
+        listeners: {
+            onClick: {
+                funcName: "automm.noteSource.fireNoteMessage",
+                args: ["{arguments}.0.0.id", "noteOn", "{that}.events"]
+            },
+
+            afterClick: {
+                funcName: "automm.noteSource.fireNoteMessage",
+                args: ["{arguments}.0.0.id", "noteOff", "{that}.events"]
+            }
+        }
+    });
+
+    automm.noteSource.fireNoteMessage = function (noteId, type, events) {
+        var msg = {
+            type: type,
+            chan: 1,
+            note: Number(noteId),
+            velocity: 127
+        };
+
+        events.message.fire(msg);
+        events[type].fire(msg);
+    };
 
     automm.controller.update = function (applier, afterInstrumentUpdate, param, value) {
         that.applier.requestChange(param, value);
@@ -1212,6 +1283,10 @@ var automm = automm || {};
                 options: {
                     model: "{withArpeggiator}.model",
                     events: {
+                        message: "{withArpeggiator}.events.message",
+                        noteOn: "{withArpeggiator}.events.noteOn",
+                        noteOff: "{withArpeggiator}.events.noteOff",
+
                         onNote: "{withArpeggiator}.events.onNote",
                         afterNote: "{withArpeggiator}.events.afterNote",
                         onClick: "{withArpeggiator}.events.onClick",
@@ -1222,6 +1297,28 @@ var automm = automm || {};
             }
         }
     });
+
+    fluid.defaults("automm.withARIA", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        components: {
+            aria: {
+                type: "automm.aria",
+                container: "{controller}.container",
+                options: {
+                    model: {
+                        octaveNotes: "{controller}.model.octaveNotes"
+                    },
+                    events: {
+                        afterUpdate: "{controller}.events.afterGuiUpdate",
+                        onClick: "{controller}.events.onClick",
+                        afterClick: "{controller}.events.afterClick",
+                        onSelect: "{controller}.events.onSelect"
+                    }
+                }
+            }
+        }
+    })
 
     fluid.defaults("automm.keyboardController", {
         gradeNames: ["automm.controller", "automm.withArpeggiator", "autoInit"],

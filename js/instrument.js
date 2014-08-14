@@ -51,6 +51,12 @@ var automm = automm || {};
         },
 
         events: {
+            // MIDI-compatible events.
+            // TODO: These should replace onNote/afterNote.
+            message: null,
+            noteOn: null,
+            noteOff: null,
+
             onNote: null,
             afterNote: null,
             afterInstrumentUpdate: null,
@@ -81,6 +87,19 @@ var automm = automm || {};
         },
 
         components: {
+            noteSource: {
+                type: "automm.noteSource",
+                options: {
+                    events: {
+                        onClick: "{controller}.events.onClick",
+                        afterClick: "{controller}.events.afterClick",
+                        message: "{controller}.events.message",
+                        noteOn: "{controller}.events.noteOn",
+                        noteOff: "{controller}.events.noteOff"
+                    }
+                }
+            },
+
             eventBinder: {
                 type: "automm.eventBinder",
                 container: "{controller}.container",
@@ -113,26 +132,47 @@ var automm = automm || {};
                         onSelect: "{controller}.events.onSelect"
                     }
                 }
-            },
-
-            aria: {
-                type: "automm.aria",
-                container: "{controller}.container",
-                options: {
-                    model: {
-                        octaveNotes: "{controller}.model.octaveNotes"
-                    },
-                    events: {
-                        afterUpdate: "{controller}.events.afterGuiUpdate",
-                        onClick: "{controller}.events.onClick",
-                        afterClick: "{controller}.events.afterClick",
-                        onSelect: "{controller}.events.onSelect"
-                    }
-                }
             }
         }
     });
 
+    fluid.defaults("automm.noteSource", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        events: {
+            onClick: null,
+            afterClick: null,
+
+            message: null,
+            noteOn: null,
+            noteOff: null
+        },
+
+        // TODO: Modelize these.
+        listeners: {
+            onClick: {
+                funcName: "automm.noteSource.fireNoteMessage",
+                args: ["{arguments}.0.0.id", "noteOn", "{that}.events"]
+            },
+
+            afterClick: {
+                funcName: "automm.noteSource.fireNoteMessage",
+                args: ["{arguments}.0.0.id", "noteOff", "{that}.events"]
+            }
+        }
+    });
+
+    automm.noteSource.fireNoteMessage = function (noteId, type, events) {
+        var msg = {
+            type: type,
+            chan: 1,
+            note: Number(noteId),
+            velocity: 127
+        };
+
+        events.message.fire(msg);
+        events[type].fire(msg);
+    };
 
     automm.controller.update = function (applier, afterInstrumentUpdate, param, value) {
         that.applier.requestChange(param, value);
@@ -178,6 +218,10 @@ var automm = automm || {};
                 options: {
                     model: "{withArpeggiator}.model",
                     events: {
+                        message: "{withArpeggiator}.events.message",
+                        noteOn: "{withArpeggiator}.events.noteOn",
+                        noteOff: "{withArpeggiator}.events.noteOff",
+
                         onNote: "{withArpeggiator}.events.onNote",
                         afterNote: "{withArpeggiator}.events.afterNote",
                         onClick: "{withArpeggiator}.events.onClick",
@@ -188,6 +232,28 @@ var automm = automm || {};
             }
         }
     });
+
+    fluid.defaults("automm.withARIA", {
+        gradeNames: ["fluid.eventedComponent", "autoInit"],
+
+        components: {
+            aria: {
+                type: "automm.aria",
+                container: "{controller}.container",
+                options: {
+                    model: {
+                        octaveNotes: "{controller}.model.octaveNotes"
+                    },
+                    events: {
+                        afterUpdate: "{controller}.events.afterGuiUpdate",
+                        onClick: "{controller}.events.onClick",
+                        afterClick: "{controller}.events.afterClick",
+                        onSelect: "{controller}.events.onSelect"
+                    }
+                }
+            }
+        }
+    })
 
     fluid.defaults("automm.keyboardController", {
         gradeNames: ["automm.controller", "automm.withArpeggiator", "autoInit"],

@@ -66,6 +66,14 @@ var automm = automm || {};
             afterInstrumentUpdate: null
         },
 
+        listeners: {
+            onNote: "{that}.onNote({arguments}.0)",
+            afterNote: "{that}.afterNote({arguments}.0)",
+            onClick: "{that}.onClick({arguments}.0)",
+            afterClick: "{that}.afterClick({arguments}.0)",
+            afterInstrumentUpdate: "{that}.update()"
+        },
+
         // Maps parameter between this model and the model of flocking
         paramMap: {
             "freq": "carrier.freq",
@@ -130,11 +138,6 @@ var automm = automm || {};
             that.polysynth.input(oscPath, newModel[path]);
         });
         /*jslint unparam: false*/
-        that.events.onNote.addListener(that.onNote);
-        that.events.afterNote.addListener(that.afterNote);
-        that.events.onClick.addListener(that.onClick);
-        that.events.afterClick.addListener(that.afterClick);
-        that.events.afterInstrumentUpdate.addListener(that.update);
     };
 
     automm.midiToFreq = function (noteNum, octaveNotes, afour, afourFreq) {
